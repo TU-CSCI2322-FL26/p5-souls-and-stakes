@@ -1,1 +1,1 @@
-# game-solver-template
+# aaaaa a scary monster
