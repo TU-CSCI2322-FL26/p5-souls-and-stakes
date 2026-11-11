@@ -52,10 +52,16 @@ updateSquares claimedSquares currentLines newLine = I DUNNO--}
 
 --story 4: computes legal moves
 --legal moves must be made of a valid square and a direction + must not already be in the game
+
+--2x2
+testGame = ([], [], 6, 7, 2)
 legalMoves :: Game -> [Line]
-legalMoves (currentLines, _, _, _, size) = [line | line <- possibleLines, not (line `elem` currentLines)]
-    where allSquares = [(x, y) | x <- [0..size], y <- [0..size]]
+legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `elem` currentLines)]
+    where allSquares = [(x, y) | x <- [0..size-1], y <- [0..size-1]]
           possibleLines = [(corner, direction) | corner <- allSquares, direction <- [East, South]]
+          bottomBorderLines = [((size, y), East) | y <- [0..size-1]]
+          rightBorderLines = [((x, size), South) | x <- [0..size-1]]
+          allLines = possibleLines ++ bottomBorderLines ++ rightBorderLines
 
 --size of the game is a square, so 3x3 means we have squares (0,0) through (2,2)
 --so legal moves would be like ((0,0), East), ((0,0), South), etc; aka moves not owned by anyone
