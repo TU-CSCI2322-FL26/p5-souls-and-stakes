@@ -35,19 +35,26 @@ detectTie lst = length (filter (==bestScore) [x | (x, _) <- lst]) > 1
 
 --story 3: making a move
 
-{--
-ISSUE: Currently, the way we represent the game makes it so we cannot represent the lines that made up the bottom and
-right borders of the grid. See text message for visual representation. This, as you can imagine, is bad! Need to speak
-to Dr. Fogarty about this soon.
+-- ISSUE: Currently, the way we represent the game makes it so we cannot represent the lines that made up the bottom and
+-- right borders of the grid. See text message for visual representation. This, as you can imagine, is bad! Need to speak
+-- to Dr. Fogarty about this soon.
 
 makeMove :: Game -> Line -> Game
-makeMove (lines, claimedSqs, currentPlayer, maxP, size) move = ((move:lines), (updateSquares ???), nextPlayer, maxP, size)
-    where nextPlayer = (currentPlayer + 1) % maxP
+makeMove (lines, claimedSqs, currentPlayer, maxP, size) move =
+  ((move:lines), (updateSquares claimedSqs currentPlayer (move:lines) move), nextPlayer, maxP, size)
+  where nextPlayer = (currentPlayer + 1) `mod` maxP
 
-updateSquares :: [(Square, Player)] -> [Line] -> Line -> [(Square, Player)]
-updateSquares claimedSquares currentLines newLine = I DUNNO--}
+updateSquares :: [(Square, Player)] -> Player -> [Line] -> Line -> [(Square, Player)]
+updateSquares claimedSquares player currentLines newLine = newSquares ++ claimedSquares
+  where newSquares = case newLine of
+                      ((x,y), East)  -> [(s, player) | s <- [(x,y), (x,y-1)], checkSquare s (newLine:currentLines)]
+                      ((x,y), South) -> [(s, player) | s <- [(x,y), (x-1,y)], checkSquare s (newLine:currentLines)]
 
-
+checkSquare :: Square -> [Line] -> Bool
+checkSquare square lines = length [ line | line <- lines, partOfSquare square line ] == 4
+  where partOfSquare (sx,sy) ((lx,ly), dir) = (sx,sy) == (lx,ly) ||
+                                              (sx == lx && sy+1 == ly && dir == East) ||
+                                              (sx+1 == lx && sy == ly && dir == South)
 
 
 --story 4: computes legal moves
