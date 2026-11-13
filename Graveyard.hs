@@ -1,6 +1,7 @@
 --Module Graveyard where
 import Data.Maybe
 import Data.List
+import Debug.Trace
 
 -- Core Data Types
 --story 1: defining data types and whatnot
@@ -13,6 +14,19 @@ type Corner = (Int, Int)
 type Square = Corner --top left corner
 type Line = (Corner, Direction)
 data Direction = East | South deriving (Show, Eq)
+
+
+-- example game start for testing
+exGameStart, exFillSquareGame :: Game
+exGameStart = ([],[], 1, 2, 2)
+exLine :: Line
+exLine = ((0,0),East)
+exFillSquareGame = ([((0,1),East),((0,0),South),((1,0),South)],[],1,2,2)
+exSquare :: Square
+exSquare = (0,0)
+squareOfLines, notSquare :: [Line]
+squareOfLines = [((0,1),East),((0,0),South),((1,0),South),exLine]
+notSquare = [((0,1),East),((0,0),South),((1,0),South)]
 
 --story 2: call winner
 --only triggers when lenght legalMoves == 0
@@ -35,19 +49,29 @@ detectTie lst = length (filter (==bestScore) [x | (x, _) <- lst]) > 1
 
 --story 3: making a move
 
-{--
-ISSUE: Currently, the way we represent the game makes it so we cannot represent the lines that made up the bottom and
-right borders of the grid. See text message for visual representation. This, as you can imagine, is bad! Need to speak
-to Dr. Fogarty about this soon.
+-- ISSUE: Currently, the way we represent the game makes it so we cannot represent the lines that made up the bottom and
+-- right borders of the grid. See text message for visual representation. This, as you can imagine, is bad! Need to speak
+-- to Dr. Fogarty about this soon.
 
 makeMove :: Game -> Line -> Game
-makeMove (lines, claimedSqs, currentPlayer, maxP, size) move = ((move:lines), (updateSquares ???), nextPlayer, maxP, size)
-    where nextPlayer = (currentPlayer + 1) % maxP
+makeMove (lines, claimedSqs, currentPlayer, maxP, size) move =
+  ((move:lines), (updateSquares claimedSqs currentPlayer (lines) move), nextPlayer, maxP, size)
+  where nextPlayer = (currentplayer `mod` maxP) +1
 
-updateSquares :: [(Square, Player)] -> [Line] -> Line -> [(Square, Player)]
-updateSquares claimedSquares currentLines newLine = I DUNNO--}
+-- we have to decide if there is a player 0. If not, we use nextPlayer = (currentplayer `mod` maxP) +1.
+-- otherwise, (currentPlayer + 1) `mod` maxP
 
+updateSquares :: [(Square, Player)] -> Player -> [Line] -> Line -> [(Square, Player)]
+updateSquares claimedSquares player currentLines newLine = newSquares ++ claimedSquares
+  where newSquares = case newLine of
+                      ((x,y), East)  -> [(s, player) | s <- [(x,y), (x,y-1)], checkSquare s (newLine:currentLines)]
+                      ((x,y), South) -> [(s, player) | s <- [(x,y), (x-1,y)], checkSquare s (newLine:currentLines)]
 
+checkSquare :: Square -> [Line] -> Bool
+checkSquare square lines = length [ line | line <- lines, partOfSquare square line ] == 4
+  where partOfSquare (sx,sy) ((lx,ly), dir) = (sx,sy) == (lx,ly) ||
+                                              (sx == lx && sy+1 == ly && dir == East) ||
+                                              (sx+1 == lx && sy == ly && dir == South)
 
 
 --story 4: computes legal moves
