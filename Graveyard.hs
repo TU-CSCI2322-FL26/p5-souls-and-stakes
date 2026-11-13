@@ -1,6 +1,7 @@
 --Module Graveyard where
 import Data.Maybe
 import Data.List
+import Debug.Trace
 
 -- Core Data Types
 --story 1: defining data types and whatnot
@@ -13,6 +14,19 @@ type Corner = (Int, Int)
 type Square = Corner --top left corner
 type Line = (Corner, Direction)
 data Direction = East | South deriving (Show, Eq)
+
+
+-- example game start for testing
+exGameStart, exFillSquareGame :: Game
+exGameStart = ([],[], 1, 2, 2)
+exLine :: Line
+exLine = ((0,0),East)
+exFillSquareGame = ([((0,1),East),((0,0),South),((1,0),South)],[],1,2,2)
+exSquare :: Square
+exSquare = (0,0)
+squareOfLines, notSquare :: [Line]
+squareOfLines = [((0,1),East),((0,0),South),((1,0),South),exLine]
+notSquare = [((0,1),East),((0,0),South),((1,0),South)]
 
 --story 2: call winner
 --only triggers when lenght legalMoves == 0
@@ -41,8 +55,10 @@ detectTie lst = length (filter (==bestScore) [x | (x, _) <- lst]) > 1
 
 makeMove :: Game -> Line -> Game
 makeMove (lines, claimedSqs, currentPlayer, maxP, size) move =
-  ((move:lines), (updateSquares claimedSqs currentPlayer (move:lines) move), nextPlayer, maxP, size)
+  ((move:lines), (updateSquares claimedSqs currentPlayer (lines) move), nextPlayer, maxP, size)
   where nextPlayer = (currentPlayer + 1) `mod` maxP
+
+-- we have to decide if there is a player 0. If not, we use nextPlayer = (currentplayer `mod` maxP) +1.
 
 updateSquares :: [(Square, Player)] -> Player -> [Line] -> Line -> [(Square, Player)]
 updateSquares claimedSquares player currentLines newLine = newSquares ++ claimedSquares
