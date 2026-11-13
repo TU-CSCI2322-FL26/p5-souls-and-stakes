@@ -56,9 +56,10 @@ detectTie lst = length (filter (==bestScore) [x | (x, _) <- lst]) > 1
 makeMove :: Game -> Line -> Game
 makeMove (lines, claimedSqs, currentPlayer, maxP, size) move =
   ((move:lines), (updateSquares claimedSqs currentPlayer (lines) move), nextPlayer, maxP, size)
-  where nextPlayer = (currentPlayer + 1) `mod` maxP
+  where nextPlayer = (currentplayer `mod` maxP) +1
 
 -- we have to decide if there is a player 0. If not, we use nextPlayer = (currentplayer `mod` maxP) +1.
+-- otherwise, (currentPlayer + 1) `mod` maxP
 
 updateSquares :: [(Square, Player)] -> Player -> [Line] -> Line -> [(Square, Player)]
 updateSquares claimedSquares player currentLines newLine = newSquares ++ claimedSquares
