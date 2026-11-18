@@ -8,6 +8,7 @@ import Debug.Trace
 
 --lines in the game, mapping from a square to its player, current player, max players, square size
 type Game = ([Line], [(Square, Player)], Player, Int, Size)
+-- data Game = Game {lines :: [Line], squares :: (Square, Player)...}
 type Size = Int
 type Player = Int
 type Corner = (Int, Int)
@@ -29,7 +30,7 @@ squareOfLines = [((0,1),East),((0,0),South),((1,0),South),exLine]
 notSquare = [((0,1),East),((0,0),South),((1,0),South)]
 
 --story 2: call winner
---only triggers when lenght legalMoves == 0
+--only triggers when length legalMoves == 0
 callWinner :: Game -> Player
 callWinner (_, filled, _, _, _) = if detectTie playerWins then 100 --deal with ties at some point
                                   else snd (maximum playerWins)
@@ -41,7 +42,8 @@ winsPerPerson claimed = map personToSquares playerList
     where playerList = nub [p | (_, p) <- claimed]
           personToSquares x = (length [sq | (sq, pl) <- claimed, pl == x], x)
     
-
+-- Deal with ties
+-- Possibly make this a list of winners (who's tied for first)
 detectTie :: [(Int, Player)] -> Bool
 detectTie lst = length (filter (==bestScore) [x | (x, _) <- lst]) > 1
     where bestScore = fst (maximum lst)
@@ -53,16 +55,19 @@ detectTie lst = length (filter (==bestScore) [x | (x, _) <- lst]) > 1
 -- right borders of the grid. See text message for visual representation. This, as you can imagine, is bad! Need to speak
 -- to Dr. Fogarty about this soon.
 
+-- Check if the move was already made
 makeMove :: Game -> Line -> Game
 makeMove (lines, claimedSqs, currentPlayer, maxP, size) move =
-  ((move:lines), (updateSquares claimedSqs currentPlayer (lines) move), nextPlayer, maxP, size)
+  ((move:lines), (newSquares ++ claimedSqs), nextPlayer, maxP, size)
   where nextPlayer = (currentplayer `mod` maxP) +1
+  -- check if there is a new square to give the current player another go.
+        newSquares = updateSquares currentPlayer (lines) move
 
 -- we have to decide if there is a player 0. If not, we use nextPlayer = (currentplayer `mod` maxP) +1.
 -- otherwise, (currentPlayer + 1) `mod` maxP
 
 updateSquares :: [(Square, Player)] -> Player -> [Line] -> Line -> [(Square, Player)]
-updateSquares claimedSquares player currentLines newLine = newSquares ++ claimedSquares
+updateSquares player currentLines newLine = newSquares
   where newSquares = case newLine of
                       ((x,y), East)  -> [(s, player) | s <- [(x,y), (x,y-1)], checkSquare s (newLine:currentLines)]
                       ((x,y), South) -> [(s, player) | s <- [(x,y), (x-1,y)], checkSquare s (newLine:currentLines)]
@@ -72,13 +77,14 @@ checkSquare square lines = length [ line | line <- lines, partOfSquare square li
   where partOfSquare (sx,sy) ((lx,ly), dir) = (sx,sy) == (lx,ly) ||
                                               (sx == lx && sy+1 == ly && dir == East) ||
                                               (sx+1 == lx && sy == ly && dir == South)
-
+-- partsOfSquare return the lines that would make up a square, use subset with that.
 
 --story 4: computes legal moves
 --legal moves must be made of a valid square and a direction + must not already be in the game
 
 --2x2
 testGame = ([], [], 6, 7, 2)
+-- Don't call this every time we call checkWinner or makeMove
 legalMoves :: Game -> [Line]
 legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `elem` currentLines)]
     where allSquares = [(x, y) | x <- [0..size-1], y <- [0..size-1]]
