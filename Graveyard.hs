@@ -95,3 +95,42 @@ legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `
 
 --size of the game is a square, so 3x3 means we have squares (0,0) through (2,2)
 --so legal moves would be like ((0,0), East), ((0,0), South), etc; aka moves not owned by anyone
+
+
+
+
+{- From Emerson's scavenge
+
+bestPlay:: Dictionary -> Hand -> Play 
+bestPlay dict hans = fst (recursiveTendrils dict hans (validMoves dict hans) ([],0))
+    
+
+tendrils :: Dictionary -> Hand -> [[(Move,Integer)]]
+tendrils dict hans = 
+    let valMoves = validMoves dict hans
+    in [(x,score x):y | x<- valMoves, y<-([([],0)]:tendrils dict (updateHand hans x))]
+
+recursiveTendrils :: Dictionary -> Hand -> [Move] -> (Play, Integer) -> (Play, Integer)
+recursiveTendrils dict hans [] (a,b) = (a,b)
+recursiveTendrils dict hans (x:xs) (a,b) = 
+    let newHand = updateHand hans x
+    in let (c,d) = recursiveTendrils dict newHand (validMoves (x:xs) newHand) ([],0)
+        in if(score x + d > b)
+            then recursiveTendrils dict hans xs (x:c, score x + d) 
+            else recursiveTendrils dict hans xs (a,b)
+
+-- ++ recursiveTendrils dict hans xs
+
+
+testDict = ["HI","I"]
+testHand = "HII"
+
+maxScore :: Dictionary -> Hand -> Integer
+maxScore dict hans = 
+    let valMoves = validMoves dict hans
+    in 
+        if(valMoves == [])
+            then 0
+            else maximum [(maxScore dict (updateHand hans x) + score x) | x <- valMoves] 
+
+-}
