@@ -1,4 +1,5 @@
---Module Graveyard where
+module Game where
+  
 import Data.Maybe
 import Data.List
 import Debug.Trace
@@ -94,4 +95,4 @@ legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `
           allLines = possibleLines ++ bottomBorderLines ++ rightBorderLines
 
 --size of the game is a square, so 3x3 means we have squares (0,0) through (2,2)
---so legal moves would be like ((0,0), East), ((0,0), South), etc; aka moves not owned by anyone
+--so legal moves would be like ((0,0), East), ((0,0), South), etc; aka moves not owned by anyoneanyone
