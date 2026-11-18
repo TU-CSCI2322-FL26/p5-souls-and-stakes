@@ -93,7 +93,31 @@ legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `
 
 -- S5 Pretty Printing
 
-StringSummoningRitual :: Game -> String
+stringSummoningRitual :: [Corner] -> Game -> String
+stringSummoningRitual [] (lines, a, b, c, size) = ""
+stringSummoningRitual ((x,0):pts) (lines, a, b, c, size)
+  | (x==size-1) = ".\n" ++ (stringSummoningRitual pts (lines, a, b, c, size))
+  | (otherwise) = "." ++ (underscoreCheck (x,0)) ++ (stringSummoningRitual pts (lines, a, b, c, size))  
+stringSummoningRitual ((x,y):pts) (lines, a, b, c, size) = 
+  if (x== size-1) 
+    then if (y<size-1)
+      then (excCheck (x,y) lines) "\n" ++ (stringSummoningRitual pts (lines, a, b, c, size))
+      else (excCheck (x,y) lines)
+    else (excCheck (x,y)) ++ (underscoreCheck (x,y)) ++ (stringSummoningRitual pts (lines, a, b, c, size))
+
+underscoreCheck :: Corner -> [Line] -> String
+underscoreCheck (x,y) lines = 
+  if (((x,y),East) `elem` lines) 
+    then "_"
+    else " "
+
+excCheck :: Corner -> [Line] -> String
+excCheck (x,y) lines = 
+  if (((x,y-1), South) `elem` lines)
+    then "!"
+    else "."
+
+
 
 {- Examples:
   . . .     size 2, no moves
@@ -108,7 +132,7 @@ StringSummoningRitual :: Game -> String
   |  |  |
   .__.__.     see this looks bad
 
-  just deal with it solution: if (((x,y+1),South) `elem` lines) then append "|"  else append "."
+  just deal with it solution: if (((x,y-1),South) `elem` lines) then append "|"  else append "."
 
   wait... !.
 
@@ -118,13 +142,4 @@ StringSummoningRitual :: Game -> String
 
 
   Okay so we're going to recurse on a list of coords that goes down rows in order. There will be <size> dots/!s and 
-  <size-1> spaces/_s. 
-
-  StringHelper ((x,0):pts) 
-    | (x==size-1) = ".\n" ++ $ StrinSsummoningRitual pts
-    | (otherwise) = "." ++ underscorecheck ++ $ StringSummoningRitual pts
-      where underscorecheck = if (((x,0),East) `elem` lines) 
-        then "_"
-        else " "
-  StringHelper ((x,y):pts)
-}
+  <size-1> spaces/_s. -}
