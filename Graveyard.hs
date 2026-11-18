@@ -89,3 +89,42 @@ legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `
 
 --size of the game is a square, so 3x3 means we have squares (0,0) through (2,2)
 --so legal moves would be like ((0,0), East), ((0,0), South), etc; aka moves not owned by anyone
+
+
+-- S5 Pretty Printing
+
+StringSummoningRitual :: Game -> String
+
+{- Examples:
+  . . .     size 2, no moves
+  . . .
+  . . .
+
+  ._._.     issue: we only keep the dots on the top row.
+  |_|_|      Potential solutions: A) add more spaces
+  |_|_|                           B) just deal with it
+
+  .__.__.
+  |  |  |
+  .__.__.     see this looks bad
+
+  just deal with it solution: if (((x,y+1),South) `elem` lines) then append "|"  else append "."
+
+  wait... !.
+
+  ._._.
+  !_._!
+  !_. .   I do think that looks a little better
+
+
+  Okay so we're going to recurse on a list of coords that goes down rows in order. There will be <size> dots/!s and 
+  <size-1> spaces/_s. 
+
+  StringHelper ((x,0):pts) 
+    | (x==size-1) = ".\n" ++ $ StrinSsummoningRitual pts
+    | (otherwise) = "." ++ underscorecheck ++ $ StringSummoningRitual pts
+      where underscorecheck = if (((x,0),East) `elem` lines) 
+        then "_"
+        else " "
+  StringHelper ((x,y):pts)
+}
