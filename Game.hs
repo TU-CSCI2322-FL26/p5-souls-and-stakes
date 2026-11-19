@@ -16,6 +16,8 @@ type Corner = (Int, Int)
 type Square = Corner --top left corner
 type Line = (Corner, Direction)
 data Direction = East | South deriving (Read, Show, Eq)
+--refractor player to account for this
+data PlayerState = Winner | Tied | Ongoing deriving (Read, Show, Eq)
 
 
 -- example game start for testing
@@ -88,7 +90,7 @@ testGame :: Game
 testGame = ([], [], 6, 7, 3)
 -- Don't call this every time we call checkWinner or makeMove
 legalMoves :: Game -> [Line]
-legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `elem` currentLines)]
+legalMoves (_, _, _, _, size) = [line | line <- allLines]
     where allSquares = [(x, y) | x <- [0..size-1], y <- [0..size-1]]
           possibleLines = [(corner, direction) | corner <- allSquares, direction <- [East, South]]
           bottomBorderLines = [((size, y), South) | y <- [0..size-1]]

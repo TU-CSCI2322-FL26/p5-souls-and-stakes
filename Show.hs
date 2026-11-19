@@ -1,6 +1,6 @@
 module Show where
 import Game
-import Text.Read1
+import Text.Read
 
 
 readGame :: String -> Game
@@ -8,7 +8,6 @@ readGame s =
     case lines s of
         [lines, claimedSqs, currentPlayer, maxP, size] -> (read lines, read claimedSqs, read currentPlayer, read maxP, read size)
         _ -> error "[incoherent screaming]"
-    
 
 
 --a is for a finished game
