@@ -9,14 +9,16 @@ import Debug.Trace
 
 --lines in the game, mapping from a square to its player, current player, max players, square size
 type Game = ([Line], [(Square, Player)], Player, Int, Size)
--- data Game = Game {lines :: [Line], squares :: (Square, Player)...}
+-- data Game = Game {lines :: [Line], squares :: [(Square, Player)]...}
 type Size = Int
 type Player = Int
 type Corner = (Int, Int)
 type Square = Corner --top left corner
 type Line = (Corner, Direction)
 data Direction = East | South deriving (Read, Show, Eq)
-
+--refractor player to account for this
+-- data PlayerState = Winner | Tied | Ongoing deriving (Read, Show, Eq)
+data Winner = Ongoing | Tied | Won Player deriving (Read, Show, Eq)
 
 -- example game start for testing
 exGameStart, exFillSquareGame :: Game
@@ -32,9 +34,9 @@ notSquare = [((0,1),East),((0,0),South),((1,0),South)]
 
 --story 2: call winner
 --only triggers when length legalMoves == 0
-callWinner :: Game -> Player
-callWinner (_, filled, _, _, _) = if detectTie playerWins then 100 --deal with ties at some point
-                                  else snd (maximum playerWins)
+callWinner :: Game -> Winner
+callWinner (_, filled, _, _, _) = if detectTie playerWins then Tied --deal with ties at some point
+                                  else Won $ snd (maximum playerWins)
     where playerWins = winsPerPerson filled
 
 
@@ -88,7 +90,7 @@ testGame :: Game
 testGame = ([], [], 6, 7, 3)
 -- Don't call this every time we call checkWinner or makeMove
 legalMoves :: Game -> [Line]
-legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `elem` currentLines)]
+legalMoves (_, _, _, _, size) = [line | line <- allLines]
     where allSquares = [(x, y) | x <- [0..size-1], y <- [0..size-1]]
           possibleLines = [(corner, direction) | corner <- allSquares, direction <- [East, South]]
           bottomBorderLines = [((size, y), South) | y <- [0..size-1]]
@@ -97,7 +99,3 @@ legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `
 
 --size of the game is a square, so 3x3 means we have squares (0,0) through (2,2)
 --so legal moves would be like ((0,0), East), ((0,0), South), etc; aka moves not owned by anyoneanyone
-
-showGame :: Game -> String
-showGame (lines, claimedSqs, currentPlayer, maxP, size) = 
-  intercalate "\n" [show lines, show claimedSqs, show currentPlayer, show maxP, show size]
