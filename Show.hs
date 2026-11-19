@@ -2,6 +2,9 @@ module Show where
 import Game
 
 
+readGame :: String -> Game
+readGame s 
+
 
 --a is for a finished game
 --b is two moves away from a win; 1 can either tie or lose
