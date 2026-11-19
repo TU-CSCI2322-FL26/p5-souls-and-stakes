@@ -15,7 +15,7 @@ type Player = Int
 type Corner = (Int, Int)
 type Square = Corner --top left corner
 type Line = (Corner, Direction)
-data Direction = East | South deriving (Show, Eq)
+data Direction = East | South deriving (Read, Show, Eq)
 
 
 -- example game start for testing
