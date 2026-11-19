@@ -99,7 +99,3 @@ legalMoves (_, _, _, _, size) = [line | line <- allLines]
 
 --size of the game is a square, so 3x3 means we have squares (0,0) through (2,2)
 --so legal moves would be like ((0,0), East), ((0,0), South), etc; aka moves not owned by anyoneanyone
-
-showGame :: Game -> String
-showGame (lines, claimedSqs, currentPlayer, maxP, size) = 
-  intercalate "\n" [show lines, show claimedSqs, show currentPlayer, show maxP, show size]
