@@ -85,14 +85,14 @@ checkSquare square lines = length [ line | line <- lines, partOfSquare square li
 
 --2x2
 testGame :: Game
-testGame = ([], [], 6, 7, 2)
+testGame = ([], [], 6, 7, 3)
 -- Don't call this every time we call checkWinner or makeMove
 legalMoves :: Game -> [Line]
 legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `elem` currentLines)]
     where allSquares = [(x, y) | x <- [0..size-1], y <- [0..size-1]]
           possibleLines = [(corner, direction) | corner <- allSquares, direction <- [East, South]]
-          bottomBorderLines = [((x, size), East) | x <- [0..size-1]]
-          rightBorderLines = [((size, y), South) | y <- [0..size-1]]
+          bottomBorderLines = [((size, y), South) | y <- [0..size-1]]
+          rightBorderLines = [((x, size), East) | x <- [0..size-1]]
           allLines = possibleLines ++ bottomBorderLines ++ rightBorderLines
 
 --size of the game is a square, so 3x3 means we have squares (0,0) through (2,2)
