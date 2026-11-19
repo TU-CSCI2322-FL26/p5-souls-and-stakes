@@ -15,7 +15,7 @@ type Player = Int
 type Corner = (Int, Int)
 type Square = Corner --top left corner
 type Line = (Corner, Direction)
-data Direction = East | South deriving (Show, Eq)
+data Direction = East | South deriving (Read, Show, Eq)
 
 
 -- example game start for testing
@@ -60,7 +60,7 @@ detectTie lst = length (filter (==bestScore) [x | (x, _) <- lst]) > 1
 makeMove :: Game -> Line -> Game
 makeMove (lines, claimedSqs, currentPlayer, maxP, size) move =
   ((move:lines), (newSquares ++ claimedSqs), nextPlayer, maxP, size)
-  where nextPlayer = (currentPlayer `mod` maxP) +1
+  where nextPlayer = if newSquares == [] then (currentPlayer `mod` maxP) +1 else currentPlayer
   -- check if there is a new square to give the current player another go.
         newSquares = updateSquares currentPlayer (lines) move
 
@@ -84,15 +84,20 @@ checkSquare square lines = length [ line | line <- lines, partOfSquare square li
 --legal moves must be made of a valid square and a direction + must not already be in the game
 
 --2x2
-testGame = ([], [], 6, 7, 2)
+testGame :: Game
+testGame = ([], [], 6, 7, 3)
 -- Don't call this every time we call checkWinner or makeMove
 legalMoves :: Game -> [Line]
 legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `elem` currentLines)]
     where allSquares = [(x, y) | x <- [0..size-1], y <- [0..size-1]]
           possibleLines = [(corner, direction) | corner <- allSquares, direction <- [East, South]]
-          bottomBorderLines = [((size, y), East) | y <- [0..size-1]]
-          rightBorderLines = [((x, size), South) | x <- [0..size-1]]
+          bottomBorderLines = [((size, y), South) | y <- [0..size-1]]
+          rightBorderLines = [((x, size), East) | x <- [0..size-1]]
           allLines = possibleLines ++ bottomBorderLines ++ rightBorderLines
 
 --size of the game is a square, so 3x3 means we have squares (0,0) through (2,2)
 --so legal moves would be like ((0,0), East), ((0,0), South), etc; aka moves not owned by anyoneanyone
+
+showGame :: Game -> String
+showGame (lines, claimedSqs, currentPlayer, maxP, size) = 
+  intercalate "\n" [show lines, show claimedSqs, show currentPlayer, show maxP, show size]
