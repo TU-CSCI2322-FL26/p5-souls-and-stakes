@@ -9,7 +9,7 @@ import Debug.Trace
 
 --lines in the game, mapping from a square to its player, current player, max players, square size
 type Game = ([Line], [(Square, Player)], Player, Int, Size)
--- data Game = Game {lines :: [Line], squares :: (Square, Player)...}
+-- data Game = Game {lines :: [Line], squares :: [(Square, Player)]...}
 type Size = Int
 type Player = Int
 type Corner = (Int, Int)
@@ -17,8 +17,8 @@ type Square = Corner --top left corner
 type Line = (Corner, Direction)
 data Direction = East | South deriving (Read, Show, Eq)
 --refractor player to account for this
-data PlayerState = Winner | Tied | Ongoing deriving (Read, Show, Eq)
-
+-- data PlayerState = Winner | Tied | Ongoing deriving (Read, Show, Eq)
+data Winner = Ongoing | Tied | Won Player deriving (Read, Show, Eq)
 
 -- example game start for testing
 exGameStart, exFillSquareGame :: Game
@@ -34,9 +34,9 @@ notSquare = [((0,1),East),((0,0),South),((1,0),South)]
 
 --story 2: call winner
 --only triggers when length legalMoves == 0
-callWinner :: Game -> Player
-callWinner (_, filled, _, _, _) = if detectTie playerWins then 100 --deal with ties at some point
-                                  else snd (maximum playerWins)
+callWinner :: Game -> Winner
+callWinner (_, filled, _, _, _) = if detectTie playerWins then Tied --deal with ties at some point
+                                  else Won $ snd (maximum playerWins)
     where playerWins = winsPerPerson filled
 
 
