@@ -114,7 +114,7 @@ underscoreCheck (x,y) lines claimedsquares =
         if (((x,y),East) `elem` lines) 
           then "_"
           else " "
-      else show (fromJust claim)
+      else underline (show (fromJust claim))
 
 excCheck :: Corner -> [Line] -> String
 excCheck (x,y) lines = 
@@ -122,6 +122,8 @@ excCheck (x,y) lines =
     then "!"
     else "."
 
+underline :: String -> String
+underline str = "\ESC[4m" ++ str ++ "\ESC[24m"
 
 
 {- Examples:
