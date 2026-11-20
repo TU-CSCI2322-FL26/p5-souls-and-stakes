@@ -40,7 +40,7 @@ callWinner (a, filled, b, c, d) =
     if (isFull (a, filled, b, c, d))
             then if detectTie playerWins 
                 then Just Tied --deal with ties at some point
-                else Won $ snd (maximum playerWins)
+                else Just (Won $ snd (maximum playerWins))
             else Nothing
     where playerWins = winsPerPerson filled
 
