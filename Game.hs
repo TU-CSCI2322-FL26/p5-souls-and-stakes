@@ -32,6 +32,20 @@ squareOfLines, notSquare :: [Line]
 squareOfLines = [((0,1),East),((0,0),South),((1,0),South),exLine]
 notSquare = [((0,1),East),((0,0),South),((1,0),South)]
 
+-- size, number of players
+newGame :: Int -> Int -> Game
+newGame x y 
+    |(x > 0 && y > 1) = ([], [], 1, y, x)
+    |otherwise = error (message1 ++ message2)
+    where message1 = 
+            if (x <= 0) 
+                then "Board size must be a positive integer. " 
+                else ""
+          message2 = 
+            if (y<=1) 
+                then "A game must have at least two players." 
+                else ""
+
 --story 2: call winner
 --only triggers when length legalMoves == 0
 -- it returns 
