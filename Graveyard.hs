@@ -56,7 +56,7 @@ detectTie lst = length (filter (==bestScore) [x | (x, _) <- lst]) > 1
 makeMove :: Game -> Line -> Game
 makeMove (lines, claimedSqs, currentPlayer, maxP, size) move =
   ((move:lines), (updateSquares claimedSqs currentPlayer (lines) move), nextPlayer, maxP, size)
-  where nextPlayer = (currentplayer `mod` maxP) +1
+  where nextPlayer = (currentPlayer `mod` maxP) +1
 
 -- we have to decide if there is a player 0. If not, we use nextPlayer = (currentplayer `mod` maxP) +1.
 -- otherwise, (currentPlayer + 1) `mod` maxP
@@ -93,17 +93,17 @@ legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `
 
 -- S5 Pretty Printing
 
-stringSummoningRitual :: [Corner] -> Game -> String
-stringSummoningRitual [] (lines, a, b, c, size) = ""
-stringSummoningRitual ((x,0):pts) (lines, a, b, c, size)
-  | (x==size-1) = ".\n" ++ (stringSummoningRitual pts (lines, a, b, c, size))
-  | (otherwise) = "." ++ (underscoreCheck (x,0)) ++ (stringSummoningRitual pts (lines, a, b, c, size))  
-stringSummoningRitual ((x,y):pts) (lines, a, b, c, size) = 
+stringSummoningRitual :: Corner -> Game -> String
+--stringSummoningRitual  (lines, a, b, c, size) = ""
+stringSummoningRitual (x,0) (lines, a, b, c, size)
+  | (x==size-1) = ".\n" ++ (stringSummoningRitual (0,1) (lines, a, b, c, size))
+  | (otherwise) = "." ++ (underscoreCheck (x,0) lines) ++ (stringSummoningRitual (x+1,0) (lines, a, b, c, size))  
+stringSummoningRitual (x,y) (lines, a, b, c, size) = 
   if (x== size-1) 
     then if (y<size-1)
-      then (excCheck (x,y) lines) "\n" ++ (stringSummoningRitual pts (lines, a, b, c, size))
+      then (excCheck (x,y) lines) ++ "\n" ++ (stringSummoningRitual (0,y+1) (lines, a, b, c, size))
       else (excCheck (x,y) lines)
-    else (excCheck (x,y)) ++ (underscoreCheck (x,y)) ++ (stringSummoningRitual pts (lines, a, b, c, size))
+    else (excCheck (x,y) lines) ++ (underscoreCheck (x,y) lines) ++ (stringSummoningRitual (x+1,y) (lines, a, b, c, size))
 
 underscoreCheck :: Corner -> [Line] -> String
 underscoreCheck (x,y) lines = 
