@@ -107,5 +107,8 @@ legalMoves (_, _, _, _, size) = [line | line <- allLines]
           rightBorderLines = [((x, size), East) | x <- [0..size-1]]
           allLines = possibleLines ++ bottomBorderLines ++ rightBorderLines
 
+availableMoves :: Game -> [Line]
+availableMoves g@(lines, _, _, _, _) = (legalMoves g) \\ lines
+
 --size of the game is a square, so 3x3 means we have squares (0,0) through (2,2)
 --so legal moves would be like ((0,0), East), ((0,0), South), etc; aka moves not owned by anyoneanyone
