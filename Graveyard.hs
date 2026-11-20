@@ -96,20 +96,25 @@ legalMoves (currentLines, _, _, _, size) = [line | line <- allLines, not (line `
 stringSummoningRitual :: Corner -> Game -> String
 --stringSummoningRitual  (lines, a, b, c, size) = ""
 stringSummoningRitual (x,0) (lines, a, b, c, size)
-  | (x==size-1) = ".\n" ++ (stringSummoningRitual (0,1) (lines, a, b, c, size))
-  | (otherwise) = "." ++ (underscoreCheck (x,0) lines) ++ (stringSummoningRitual (x+1,0) (lines, a, b, c, size))  
+  | (x==size) = ".\n" ++ (stringSummoningRitual (0,1) (lines, a, b, c, size))
+  | (otherwise) = "." ++ (underscoreCheck (x,0) lines a) ++ (stringSummoningRitual (x+1,0) (lines, a, b, c, size))  
 stringSummoningRitual (x,y) (lines, a, b, c, size) = 
-  if (x== size-1) 
-    then if (y<size-1)
+  if (x== size) 
+    then if (y<size)
       then (excCheck (x,y) lines) ++ "\n" ++ (stringSummoningRitual (0,y+1) (lines, a, b, c, size))
       else (excCheck (x,y) lines)
-    else (excCheck (x,y) lines) ++ (underscoreCheck (x,y) lines) ++ (stringSummoningRitual (x+1,y) (lines, a, b, c, size))
+    else (excCheck (x,y) lines) ++ (underscoreCheck (x,y) lines a) ++ (stringSummoningRitual (x+1,y) (lines, a, b, c, size))
 
-underscoreCheck :: Corner -> [Line] -> String
-underscoreCheck (x,y) lines = 
-  if (((x,y),East) `elem` lines) 
-    then "_"
-    else " "
+underscoreCheck :: Corner -> [Line] -> [(Square, Player)] -> String
+underscoreCheck (x,y) lines claimedsquares = 
+  let claim = lookup (x,y-1) claimedsquares
+  in
+    if (claim == Nothing)
+      then
+        if (((x,y),East) `elem` lines) 
+          then "_"
+          else " "
+      else show (fromJust claim)
 
 excCheck :: Corner -> [Line] -> String
 excCheck (x,y) lines = 
