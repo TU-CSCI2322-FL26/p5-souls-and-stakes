@@ -18,7 +18,7 @@ type Line = (Corner, Direction)
 data Direction = East | South deriving (Read, Show, Eq)
 --refractor player to account for this
 -- data PlayerState = Winner | Tied | Ongoing deriving (Read, Show, Eq)
-data Winner = Ongoing | Tied | Won Player deriving (Read, Show, Eq)
+data Winner = Tied | Won Player deriving (Read, Show, Eq)
 
 -- example game start for testing
 exGameStart, exFillSquareGame :: Game
@@ -34,10 +34,20 @@ notSquare = [((0,1),East),((0,0),South),((1,0),South)]
 
 --story 2: call winner
 --only triggers when length legalMoves == 0
-callWinner :: Game -> Winner
-callWinner (_, filled, _, _, _) = if detectTie playerWins then Tied --deal with ties at some point
-                                  else Won $ snd (maximum playerWins)
+-- it returns 
+callWinner :: Game -> Maybe Winner
+callWinner (a, filled, b, c, d) = 
+    if (isFull (a, filled, b, c, d))
+            then if detectTie playerWins 
+                then Just Tied --deal with ties at some point
+                else Just (Won $ snd (maximum playerWins))
+            else Nothing
     where playerWins = winsPerPerson filled
+
+--check whether there are any more legal moves by checking whether all squares are filled.
+-- There are size^2 squares.
+isFull :: Game -> Bool
+isFull (_,claimedSquares,_,_,size) = ((length claimedSquares) == size^2)
 
 
 winsPerPerson :: [(Square, Player)] -> [(Int, Player)] 

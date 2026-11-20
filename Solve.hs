@@ -6,10 +6,11 @@ import Data.List
 -- TODO Optimize this
 whoWillWin :: Game -> Winner
 whoWillWin game@(lines, claimedSqs, player, maxP, size) =
-  case possibleGames game of
-    [] -> callWinner game
-    gs -> let possible = (map whoWillWin (gs)) in if Won player `elem` possible then Won player
-          else if Tied `elem` possible then Tied else Won ((player `mod` maxP) +1)
+  case callWinner game of
+    Just winner -> winner
+    Nothing -> let possible = map whoWillWin (possibleGames game) 
+               in  if Won player `elem` possible then Won player
+                    else if Tied `elem` possible then Tied else Won ((player `mod` maxP) +1)
 
 bestMove :: Game -> Maybe Line
 bestMove game@(lines, claimedSqs, player, maxP, size) =
@@ -21,6 +22,7 @@ bestMove game@(lines, claimedSqs, player, maxP, size) =
         Nothing -> case lookup Tied possible of
           Just l -> Just l
           Nothing -> Just $ snd $ head possible
+-- want to check winner first, then possible moves
 
 possibleGames :: Game -> [Game]
 possibleGames g@(lines, sqsP, p, maxp, size) = [makeMove g l | l <- availableMoves g]
